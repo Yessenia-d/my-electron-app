@@ -5,66 +5,40 @@ on:
     branches:
       - main
       - dev  # 如果你希望在 dev 分支也触发发布
+    # tags:
+    #   - 'v*'  # 只在推送 v 开头的 tag 时触发（如 v1.0.0）
+
+permissions:
+  contents: write  # 允许创建 Release 和上传文件
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest  # 在 Ubuntu 上构建 Linux 版本
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'  # 使用适合你的项目的 Node.js 版本
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build and package Electron app for Linux
-        run: pnpm run make -- --arch x64  # 构建 Linux x64 版本的应用
-
-      - name: Publish to GitHub Releases
-        run: pnpm run publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-mac:
-    runs-on: macos-latest  # 在 macOS 上构建 macOS 版本
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build and package Electron app for macOS
-        run: pnpm run make -- --arch x64  # 构建 macOS x64 版本的应用
-
-      - name: Publish to GitHub Releases
-        run: pnpm run publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-windows:
-    runs-on: windows-latest  # 在 Windows 上构建 Windows 版本
+  release:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS - 构建 arm64 和 x64 通用版本
+          - os: macos-latest
+            platform: darwin
+            arch: universal
+          
+          # Linux - 构建 x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          
+          # Windows - 构建 x64 (64位)
+          - os: windows-latest
+            platform: win32
+            arch: x64
+          
+          # Windows - 构建 ia32 (32位)  [可选]
+          # - os: windows-latest
+          #   platform: win32
+          #   arch: ia32
+    
+    runs-on: ${{ matrix.os }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -83,8 +57,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build and package Electron app for Windows
-        run: pnpm run make -- --arch x64  # 构建 Windows x64 版本的应用
+      - name: Build Electron app (${{ matrix.platform }} ${{ matrix.arch }})
+        run: pnpm run make -- --arch=${{ matrix.arch }}
 
       - name: Publish to GitHub Releases
         run: pnpm run publish
