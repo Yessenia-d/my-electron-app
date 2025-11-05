@@ -7,6 +7,7 @@ on:
       - dev  # 如果你希望在 dev 分支也触发发布
     # tags:
     #   - 'v*'  # 只在推送 v 开头的 tag 时触发（如 v1.0.0）
+  # workflow_dispatch:  # 可选：允许手动触发
 
 permissions:
   contents: write  # 允许创建 Release 和上传文件
@@ -17,10 +18,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # macOS - 构建 arm64 和 x64 通用版本
+          # macOS - 构建 arm64 (Apple Silicon: M1/M2/M3) - 推荐
           - os: macos-latest
             platform: darwin
-            arch: universal
+            arch: arm64
+          
+          # macOS - 构建 x64 (Intel Mac) - 推荐
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+          
+          # macOS - 构建 universal (所有 Mac) - 可选，文件较大
+          # - os: macos-latest
+          #   platform: darwin
+          #   arch: universal
           
           # Linux - 构建 x64
           - os: ubuntu-latest
@@ -31,11 +42,6 @@ jobs:
           - os: windows-latest
             platform: win32
             arch: x64
-          
-          # Windows - 构建 ia32 (32位)  [可选]
-          # - os: windows-latest
-          #   platform: win32
-          #   arch: ia32
     
     runs-on: ${{ matrix.os }}
     
