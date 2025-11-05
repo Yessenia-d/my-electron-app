@@ -2,12 +2,9 @@ name: Build and Publish Electron App
 
 on:
   push:
-    branches:
-      - main
-      - dev  # 如果你希望在 dev 分支也触发发布
-    # tags:
-    #   - 'v*'  # 只在推送 v 开头的 tag 时触发（如 v1.0.0）
-  # workflow_dispatch:  # 可选：允许手动触发
+    tags:
+      - 'v*'  # 只在推送 v 开头的 tag 时触发（如 v1.0.0）
+#   workflow_dispatch:  # 允许手动触发
 
 permissions:
   contents: write  # 允许创建 Release 和上传文件
