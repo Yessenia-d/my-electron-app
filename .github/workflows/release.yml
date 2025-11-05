@@ -11,21 +11,27 @@ jobs:
     runs-on: ubuntu-latest  # 在 Ubuntu 上构建 Linux 版本
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '22'  # 使用适合你的项目的 Node.js 版本
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Build and package Electron app for Linux
-        run: pnpm make -- --arch x64  # 构建 Linux x64 版本的应用
+        run: pnpm run make -- --arch x64  # 构建 Linux x64 版本的应用
 
       - name: Publish to GitHub Releases
-        run: pnpm publish
+        run: pnpm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -33,21 +39,27 @@ jobs:
     runs-on: macos-latest  # 在 macOS 上构建 macOS 版本
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '22'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Build and package Electron app for macOS
-        run: pnpm make -- --arch x64  # 构建 macOS x64 版本的应用
+        run: pnpm run make -- --arch x64  # 构建 macOS x64 版本的应用
 
       - name: Publish to GitHub Releases
-        run: pnpm publish
+        run: pnpm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -55,20 +67,26 @@ jobs:
     runs-on: windows-latest  # 在 Windows 上构建 Windows 版本
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '22'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Build and package Electron app for Windows
-        run: pnpm make -- --arch x64  # 构建 Windows x64 版本的应用
+        run: pnpm run make -- --arch x64  # 构建 Windows x64 版本的应用
 
       - name: Publish to GitHub Releases
-        run: pnpm publish
+        run: pnpm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
